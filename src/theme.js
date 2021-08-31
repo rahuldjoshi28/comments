@@ -1,12 +1,9 @@
 const theme = {
   colors: {
     gray1: "#E0E0E0",
-    gray2: "",
+    gray2: "#787878",
 
-    white: "#F8F8F8",
-
-    black1: "",
-    black2: ""
+    white: "#F8F8F8"
   },
   breakpoints: {
     sm: 480,

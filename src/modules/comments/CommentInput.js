@@ -12,6 +12,7 @@ function CommentInput({ onPost, placeholder = "Write a comment..." }) {
 
   const handlePost = () => {
     onPost(comment);
+    setComment("");
   };
 
   return (
