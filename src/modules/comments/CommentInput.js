@@ -3,7 +3,11 @@ import Input from "../../components/Input";
 import styled from "styled-components";
 import { IoSend } from "react-icons/io5";
 
-function CommentInput({ onPost, placeholder = "Write a comment..." }) {
+function CommentInput({
+  onPost,
+  placeholder = "Write a comment...",
+  className,
+}) {
   const [comment, setComment] = useState("");
 
   const onChange = (e) => {
@@ -16,7 +20,7 @@ function CommentInput({ onPost, placeholder = "Write a comment..." }) {
   };
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <Input placeholder={placeholder} value={comment} onChange={onChange} />
       {comment.length > 0 && <SendButton onClick={handlePost} />}
     </Wrapper>

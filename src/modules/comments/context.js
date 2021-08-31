@@ -1,15 +1,13 @@
 import { createContext, useContext, useState } from "react";
+import { createNewComment } from "../../App";
 
 export const CommentsContext = createContext([]);
 
 export function CommentsProvider({ comments: initialComments = [], children }) {
   const [comments, setComments] = useState(initialComments);
 
-  const addComment = (newComment) =>
-    setComments((comments) => [...comments, newComment]);
-
   const props = {
-    addComment,
+    setComments,
     comments,
   };
 
@@ -20,8 +18,30 @@ export function CommentsProvider({ comments: initialComments = [], children }) {
   );
 }
 
-export function useComments() {
-  const { addComment, comments } = useContext(CommentsContext);
+function withReply(comments, post, trail) {
+  let newComments = [...comments];
+  let current = newComments;
+  trail.forEach((trailId, index) => {
+    const target = current.find(({ id }) => id === trailId);
+    if (index === trail.length - 1) {
+      target.replies = [...target.replies, post];
+      return;
+    }
+    current = target.replies;
+  });
+  return newComments;
+}
 
-  return { addComment, comments };
+export function useComments() {
+  const { setComments, comments } = useContext(CommentsContext);
+
+  const addReply = (newComment, trail) =>
+    setComments((comments) => withReply(comments, newComment, trail));
+
+  const addComment = (newComment) =>
+    setComments((comments) => [...comments, newComment]);
+
+  console.log(comments);
+
+  return { addComment, comments, addReply };
 }

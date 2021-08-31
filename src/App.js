@@ -1,12 +1,12 @@
 import "./App.css";
-import styled, {ThemeProvider} from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import theme from "./theme";
-import {Container} from "./components/Container";
+import { Container } from "./components/Container";
 import CommentInput from "./modules/comments/CommentInput";
-import {IconContext} from "react-icons";
-import {CommentsProvider, useComments} from "./modules/comments/context";
-import {generateUUId, seed} from "./modules/uuid";
-import {Comments} from "./modules/comments/Comments";
+import { IconContext } from "react-icons";
+import { CommentsProvider, useComments } from "./modules/comments/context";
+import { generateUUId, seed } from "./modules/uuid";
+import { Comments } from "./modules/comments/Comments";
 
 seed(0);
 
@@ -29,19 +29,21 @@ function App() {
 
 const CommentsWrapper = styled.div``;
 
-const createNewComment = (author, commentText) => {
+export const createNewComment = (author, commentText) => {
   return {
     commentText,
     author,
     id: generateUUId(),
     timestamp: Date.now(),
+    replies: [],
   };
 };
 
 function NewComment() {
   const { addComment } = useComments();
 
-  const handleAdd = (post) => addComment(createNewComment("Random Person", post));
+  const handleAdd = (post) =>
+    addComment(createNewComment("Random Person", post));
 
   return <CommentInput onPost={handleAdd} />;
 }

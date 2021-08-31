@@ -1,14 +1,14 @@
-import {useComments} from "./context";
+import { useComments } from "./context";
 import styled from "styled-components";
-import {CommentCard} from "./CommentCard";
+import { CommentCard } from "./CommentCard";
 
-export function Comments({ trail = [] }) {
+export function Comments() {
   const { comments } = useComments();
 
   return (
     <Wrapper>
       {comments.map(({ id, ...rest }) => {
-        return <StyledComment key={id} {...rest} />;
+        return <StyledComment key={id} {...rest} id={id} trail={[id]} />;
       })}
     </Wrapper>
   );
@@ -20,6 +20,4 @@ const StyledComment = styled(CommentCard)`
 
 const Wrapper = styled.div`
   margin-top: 20px;
-  width: fit-content;
 `;
-

@@ -1,25 +1,65 @@
 import styled from "styled-components";
+import { useState } from "react";
+import CommentInput from "./CommentInput";
+import { createNewComment } from "../../App";
+import { useComments } from "./context";
 
-export function CommentCard({ author, commentText, timestamp, className }) {
+export function CommentCard({
+  author,
+  commentText,
+  timestamp,
+  className,
+  id,
+  trail = [],
+  replies,
+}) {
+  const [reply, setReply] = useState(false);
+  const { addReply } = useComments();
+  const handleReply = (post) => {
+    addReply(createNewComment("ASDASD", post), [...trail]);
+  };
+
   return (
     <div className={className}>
       <CommentBox>
         <Author>{author}</Author>
         <CommentText>{commentText}</CommentText>
       </CommentBox>
-      <ActionFooter timestamp={timestamp} />
+      <ActionFooter timestamp={timestamp} onReply={() => setReply(true)} />
+      {replies.length > 0 && (
+        <ReplyWrapper>
+          {replies.map((reply) => (
+            <CommentCard
+              key={reply.id}
+              {...reply}
+              trail={[...trail, reply.id]}
+            />
+          ))}
+        </ReplyWrapper>
+      )}
+      {reply && (
+        <ReplyInput placeholder={"Write a reply..."} onPost={handleReply} />
+      )}
     </div>
   );
 }
 
-function ActionFooter({ timestamp }) {
+const ReplyWrapper = styled.div`
+  margin-left: 20px;
+`;
+
+const ReplyInput = styled(CommentInput)`
+  margin-top: 10px;
+`;
+
+function ActionFooter({ timestamp, onReply }) {
   return (
     <Ul>
       <Li>
         <LinkButton>Like</LinkButton>
       </Li>
       <Li>
-        <LinkButton>Reply</LinkButton>
+        <LinkButton onClick={onReply}>Reply</LinkButton>
       </Li>
       <Li>
         <TimeStamp>{timestamp}</TimeStamp>
@@ -69,6 +109,7 @@ const CommentBox = styled.div`
   display: flex;
   flex-direction: column;
   padding: 12px;
+  width: fit-content;
 `;
 
 const CommentText = styled.p`
