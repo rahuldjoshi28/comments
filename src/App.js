@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import styled, { ThemeProvider } from "styled-components";
+import theme from "./theme";
+import { Container } from "./components/Container";
+import CommentInput from "./modules/comments/CommentInput";
+import { IconContext } from "react-icons";
 
 function App() {
+  const postComment = (a) => console.log("POST ", a);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <IconContext.Provider value={{ className: "icon" }}>
+      <ThemeProvider theme={theme}>
+        <PageWrapper>
+          <CommentInput onPost={postComment} />
+        </PageWrapper>
+      </ThemeProvider>
+    </IconContext.Provider>
   );
 }
+
+const PageWrapper = styled(Container)`
+  margin-top: 40px;
+`;
 
 export default App;
