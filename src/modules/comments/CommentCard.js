@@ -1,11 +1,13 @@
 import styled from "styled-components";
 import { useState } from "react";
 import CommentInput from "./CommentInput";
-import { Avatar, createNewComment } from "../../App";
 import { useComments } from "./context";
 import { getCurrentUser, getCurrentUserName, getUserDetails } from "../user";
 import { Flex } from "../../components/Flex";
 import { formatTimePassed } from "../../utils/time";
+import { Actions } from "./actions";
+import { Avatar } from "../../components/Avatar";
+import { createNewComment } from "./NewComment";
 
 export function CommentCard({
   author,
@@ -18,17 +20,19 @@ export function CommentCard({
   likes,
 }) {
   const [reply, setReply] = useState(false);
-  const { addReply, deleteComment, likeComment } = useComments();
+  const { dispatch } = useComments();
   const handleReply = (post) => {
-    addReply(createNewComment(getCurrentUserName(), post), [...trail]);
+    const newComment = createNewComment(getCurrentUserName(), post);
+    dispatch(Actions.replyComment(newComment, trail));
     setReply(false);
   };
+
   const authorDetails = getUserDetails(author);
   const currentUser = getCurrentUserName();
 
-  const handleDelete = () => deleteComment(trail);
+  const handleDelete = () => dispatch(Actions.deleteComment(trail));
 
-  const handleLike = () => likeComment(trail, currentUser);
+  const handleLike = () => dispatch(Actions.likeComment(trail, currentUser));
 
   return (
     <Wrapper className={className}>
