@@ -1,5 +1,6 @@
 export function getStorage(key) {
   const item = localStorage.getItem(key);
+  if (item === "undefined") return null;
   return JSON.parse(item);
 }
 

@@ -1,10 +1,10 @@
-let uuid = 0;
+import { getStorage, setStorage } from "./storage";
 
-export function seed(initialSeed) {
-  uuid = initialSeed + 1;
-}
+let uuid = getStorage("counter") || 0;
+
 
 export function generateUUId() {
   uuid++;
+  setStorage("counter", uuid);
   return uuid;
 }

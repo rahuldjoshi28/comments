@@ -1,12 +1,23 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { getStorage, setStorage } from "../../utils/storage";
 
 export const CommentsContext = createContext([]);
 
-export function CommentsProvider({ comments: initialComments = [], children }) {
-  const [comments, setComments] = useState(initialComments);
+export function CommentsProvider({ children }) {
+  const [comments, setComments] = useState(
+    () => getStorage("comments") || []
+  );
+
+  const updateComments = (newComments) => {
+    setComments(newComments);
+  };
+
+  useEffect(() => {
+    setStorage("comments", comments);
+  }, [comments]);
 
   const props = {
-    setComments,
+    setComments: updateComments,
     comments,
   };
 

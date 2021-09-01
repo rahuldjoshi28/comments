@@ -1,18 +1,20 @@
 import "./App.css";
-import styled, {ThemeProvider} from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import theme from "./theme";
-import {Container} from "./components/Container";
+import { Container } from "./components/Container";
 import CommentInput from "./modules/comments/CommentInput";
-import {IconContext} from "react-icons";
-import {CommentsProvider, useComments} from "./modules/comments/context";
-import {generateUUId, seed} from "./utils/uuid";
-import {Comments} from "./modules/comments/Comments";
-import {getCurrentUser, getCurrentUserName, getUserNames,} from "./modules/user";
-import {useRef} from "react";
-import {setStorage} from "./utils/storage";
-import {Flex} from "./components/Flex";
-
-seed(0);
+import { IconContext } from "react-icons";
+import { CommentsProvider, useComments } from "./modules/comments/context";
+import { generateUUId } from "./utils/uuid";
+import { Comments } from "./modules/comments/Comments";
+import {
+  getCurrentUser,
+  getCurrentUserName,
+  getUserNames,
+} from "./modules/user";
+import { useRef } from "react";
+import { setStorage } from "./utils/storage";
+import { Flex } from "./components/Flex";
 
 function App() {
   return (

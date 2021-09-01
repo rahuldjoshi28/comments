@@ -11,6 +11,6 @@ const StyledInput = styled.input`
   border: none;
   height: 40px;
   background-color: ${({ theme }) => theme.colors.gray1};
-  padding: 0 20px;
+  padding: 0 40px 0 20px;
   box-sizing: border-box;
 `;

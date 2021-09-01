@@ -177,6 +177,7 @@ const CommentBox = styled.div`
   flex-direction: column;
   padding: 12px;
   width: fit-content;
+  min-width: 180px;
 `;
 
 const CommentText = styled.p`
