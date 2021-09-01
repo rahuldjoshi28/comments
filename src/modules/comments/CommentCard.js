@@ -5,6 +5,7 @@ import { Avatar, createNewComment } from "../../App";
 import { useComments } from "./context";
 import { getCurrentUser, getCurrentUserName, getUserDetails } from "../user";
 import { Flex } from "../../components/Flex";
+import { formatTimePassed } from "../../utils/time";
 
 export function CommentCard({
   author,
@@ -14,31 +15,35 @@ export function CommentCard({
   id,
   trail = [],
   replies,
+  likes,
 }) {
   const [reply, setReply] = useState(false);
-  const { addReply, deleteComment } = useComments();
+  const { addReply, deleteComment, likeComment } = useComments();
   const handleReply = (post) => {
     addReply(createNewComment(getCurrentUserName(), post), [...trail]);
     setReply(false);
   };
   const authorDetails = getUserDetails(author);
+  const currentUser = getCurrentUserName();
 
-  const handleDelete = () => {
-    deleteComment(trail);
-  };
+  const handleDelete = () => deleteComment(trail);
+
+  const handleLike = () => likeComment(trail, currentUser);
 
   return (
     <Wrapper className={className}>
       <Avatar src={authorDetails.avatarUrl} userName={authorDetails.userName} />
       <CommentWrapper>
         <CommentBox>
-          <Author>{author}</Author>
+          <Author>{authorDetails.displayName}</Author>
           <CommentText>{commentText}</CommentText>
         </CommentBox>
         <ActionFooter
           timestamp={timestamp}
           onReply={() => setReply(true)}
-          onDelete={() => handleDelete()}
+          onDelete={handleDelete}
+          likes={likes}
+          onLike={handleLike}
         />
         {replies.length > 0 && (
           <ReplyWrapper>
@@ -88,50 +93,17 @@ const InputWrapper = styled(Flex)`
   }
 `;
 
-const HOURS_IN_DAY = 24;
-const MINUTES_IN_HOUR = 60;
-const SECONDS_IN_MINUTE = 60;
-const MILLISECONDS_IN_SECOND = 1000;
+function ActionFooter({ timestamp, onReply, onDelete, onLike, likes }) {
+  const currentUser = getCurrentUserName();
+  const liked = likes[currentUser];
+  const numberOfLikes = Object.keys(likes).length;
 
-const DateUtils = {
-  toDays(seconds) {
-    return Math.floor(
-      seconds / (HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE)
-    );
-  },
-  toHours(seconds) {
-    return Math.floor(seconds / (MINUTES_IN_HOUR * SECONDS_IN_MINUTE));
-  },
-  toMinutes(seconds) {
-    return Math.floor(seconds / SECONDS_IN_MINUTE);
-  },
-  toSeconds(milliseconds) {
-    return milliseconds / MILLISECONDS_IN_SECOND;
-  },
-};
-
-function formatTimePassed(timestamp) {
-  const currentTime = Date.now();
-
-  const differentInSeconds = DateUtils.toSeconds(currentTime - timestamp);
-
-  const days = DateUtils.toDays(differentInSeconds);
-  if (days > 0) return `${days} d`;
-
-  const hours = DateUtils.toHours(differentInSeconds);
-  if (hours > 0) return `${hours} h`;
-
-  const minutes = DateUtils.toMinutes(differentInSeconds);
-  if (minutes > 0) return `${minutes} m`;
-
-  return "a few seconds ago";
-}
-
-function ActionFooter({ timestamp, onReply, onDelete }) {
   return (
     <Ul>
       <Li>
-        <LinkButton>Like</LinkButton>
+        <LikeButton liked={liked} onClick={onLike}>
+          {numberOfLikes === 0 ? "Like" : `${numberOfLikes} Likes`}
+        </LikeButton>
       </Li>
       <Li>
         <LinkButton onClick={onReply}>Reply</LinkButton>
@@ -172,13 +144,17 @@ const Li = styled.li`
 `;
 
 const LinkButton = styled.button`
-  font-style: bold;
   background-color: transparent;
   border: none;
   cursor: pointer;
   font-weight: bold;
   color: ${({ theme }) => theme.colors.gray2};
   font-size: 12px;
+`;
+
+const LikeButton = styled(LinkButton)`
+  color: ${({ theme, liked }) =>
+    liked ? theme.colors.gray3 : theme.colors.gray2};
 `;
 
 const CommentBox = styled.div`

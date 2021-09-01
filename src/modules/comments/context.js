@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { getStorage, setStorage } from "../../utils/storage";
 
 export const CommentsContext = createContext([]);
@@ -6,16 +12,12 @@ export const CommentsContext = createContext([]);
 export function CommentsProvider({ children }) {
   const [comments, setComments] = useState(() => getStorage("comments") || []);
 
-  const updateComments = (newComments) => {
-    setComments(newComments);
-  };
-
   useEffect(() => {
     setStorage("comments", comments);
   }, [comments]);
 
   const props = {
-    setComments: updateComments,
+    setComments,
     comments,
   };
 
@@ -61,6 +63,24 @@ function delComment(comments, trail) {
   return itr;
 }
 
+export function like(comments, trail, currentUser) {
+  const newComments = [...comments];
+  let itr = newComments;
+  trail.forEach((trailId, index) => {
+    const target = itr.find(({ id }) => id === trailId);
+    if (index === trail.length - 1) {
+      if (target.likes[currentUser]) {
+        delete target.likes[currentUser];
+      } else {
+        target.likes[currentUser] = true;
+      }
+      return;
+    }
+    itr = target.replies;
+  });
+  return newComments;
+}
+
 export function useComments() {
   const { setComments, comments } = useContext(CommentsContext);
 
@@ -74,5 +94,9 @@ export function useComments() {
     setComments((comments) => delComment(comments, trail));
   };
 
-  return { addComment, comments, addReply, deleteComment };
+  const likeComment = (trail, userName) => {
+    setComments(like(comments, trail, userName));
+  };
+
+  return { addComment, comments, addReply, deleteComment, likeComment };
 }

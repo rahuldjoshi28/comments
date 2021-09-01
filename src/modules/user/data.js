@@ -6,7 +6,7 @@ export const users = [
   },
   {
     userName: "two",
-    displayName: "One",
+    displayName: "Two",
     avatarUrl: "/avatars/avatar2.jpeg",
   },
 ];

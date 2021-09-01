@@ -77,6 +77,7 @@ export const createNewComment = (author, commentText) => {
     id: generateUUId(),
     timestamp: Date.now(),
     replies: [],
+    likes: {},
   };
 };
 
