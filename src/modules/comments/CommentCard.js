@@ -1,8 +1,10 @@
 import styled from "styled-components";
 import { useState } from "react";
 import CommentInput from "./CommentInput";
-import { createNewComment } from "../../App";
+import { Avatar, createNewComment } from "../../App";
 import { useComments } from "./context";
+import { getCurrentUser, getCurrentUserName, getUserDetails } from "../user";
+import { Flex } from "../../components/Flex";
 
 export function CommentCard({
   author,
@@ -16,40 +18,66 @@ export function CommentCard({
   const [reply, setReply] = useState(false);
   const { addReply } = useComments();
   const handleReply = (post) => {
-    addReply(createNewComment("ASDASD", post), [...trail]);
+    addReply(createNewComment(getCurrentUserName(), post), [...trail]);
+    setReply(false);
   };
+  const authorDetails = getUserDetails(author);
 
   return (
-    <div className={className}>
-      <CommentBox>
-        <Author>{author}</Author>
-        <CommentText>{commentText}</CommentText>
-      </CommentBox>
-      <ActionFooter timestamp={timestamp} onReply={() => setReply(true)} />
-      {replies.length > 0 && (
-        <ReplyWrapper>
-          {replies.map((reply) => (
-            <CommentCard
-              key={reply.id}
-              {...reply}
-              trail={[...trail, reply.id]}
-            />
-          ))}
-        </ReplyWrapper>
-      )}
-      {reply && (
-        <ReplyInput placeholder={"Write a reply..."} onPost={handleReply} />
-      )}
-    </div>
+    <Wrapper className={className}>
+      <Avatar src={authorDetails.avatarUrl} userName={authorDetails.userName} />
+      <CommentWrapper>
+        <CommentBox>
+          <Author>{author}</Author>
+          <CommentText>{commentText}</CommentText>
+        </CommentBox>
+        <ActionFooter timestamp={timestamp} onReply={() => setReply(true)} />
+        {replies.length > 0 && (
+          <ReplyWrapper>
+            {replies.map((reply) => (
+              <CommentCard
+                key={reply.id}
+                {...reply}
+                trail={[...trail, reply.id]}
+              />
+            ))}
+          </ReplyWrapper>
+        )}
+        {reply && <ReplyInput onPost={handleReply} />}
+      </CommentWrapper>
+    </Wrapper>
   );
 }
 
-const ReplyWrapper = styled.div`
-  margin-left: 20px;
+const CommentWrapper = styled.div`
+  width: 100%;
 `;
 
-const ReplyInput = styled(CommentInput)`
+const Wrapper = styled(Flex)`
+  img {
+    margin-right: 10px;
+  }
   margin-top: 10px;
+`;
+
+const ReplyWrapper = styled.div``;
+
+function ReplyInput({ onPost }) {
+  const currentUser = getCurrentUser();
+  return (
+    <InputWrapper>
+      <Avatar src={currentUser.avatarUrl} userName={currentUser.userName} />
+      <CommentInput placeholder={"Write a reply..."} onPost={onPost} />
+    </InputWrapper>
+  );
+}
+
+const InputWrapper = styled(Flex)`
+  margin-top: 10px;
+
+  img {
+    margin-right: 10px;
+  }
 `;
 
 const HOURS_IN_DAY = 24;

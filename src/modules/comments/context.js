@@ -1,5 +1,4 @@
 import { createContext, useContext, useState } from "react";
-import { createNewComment } from "../../App";
 
 export const CommentsContext = createContext([]);
 
@@ -40,8 +39,6 @@ export function useComments() {
 
   const addComment = (newComment) =>
     setComments((comments) => [...comments, newComment]);
-
-  console.log(comments);
 
   return { addComment, comments, addReply };
 }
