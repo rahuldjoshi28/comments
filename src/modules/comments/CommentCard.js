@@ -16,12 +16,16 @@ export function CommentCard({
   replies,
 }) {
   const [reply, setReply] = useState(false);
-  const { addReply } = useComments();
+  const { addReply, deleteComment } = useComments();
   const handleReply = (post) => {
     addReply(createNewComment(getCurrentUserName(), post), [...trail]);
     setReply(false);
   };
   const authorDetails = getUserDetails(author);
+
+  const handleDelete = () => {
+    deleteComment(trail);
+  };
 
   return (
     <Wrapper className={className}>
@@ -31,7 +35,11 @@ export function CommentCard({
           <Author>{author}</Author>
           <CommentText>{commentText}</CommentText>
         </CommentBox>
-        <ActionFooter timestamp={timestamp} onReply={() => setReply(true)} />
+        <ActionFooter
+          timestamp={timestamp}
+          onReply={() => setReply(true)}
+          onDelete={() => handleDelete()}
+        />
         {replies.length > 0 && (
           <ReplyWrapper>
             {replies.map((reply) => (
@@ -119,7 +127,7 @@ function formatTimePassed(timestamp) {
   return "a few seconds ago";
 }
 
-function ActionFooter({ timestamp, onReply }) {
+function ActionFooter({ timestamp, onReply, onDelete }) {
   return (
     <Ul>
       <Li>
@@ -127,6 +135,9 @@ function ActionFooter({ timestamp, onReply }) {
       </Li>
       <Li>
         <LinkButton onClick={onReply}>Reply</LinkButton>
+      </Li>
+      <Li>
+        <LinkButton onClick={onDelete}>Delete</LinkButton>
       </Li>
       <Li>
         <TimeStamp>{formatTimePassed(timestamp)}</TimeStamp>

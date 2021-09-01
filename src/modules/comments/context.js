@@ -4,9 +4,7 @@ import { getStorage, setStorage } from "../../utils/storage";
 export const CommentsContext = createContext([]);
 
 export function CommentsProvider({ children }) {
-  const [comments, setComments] = useState(
-    () => getStorage("comments") || []
-  );
+  const [comments, setComments] = useState(() => getStorage("comments") || []);
 
   const updateComments = (newComments) => {
     setComments(newComments);
@@ -30,16 +28,37 @@ export function CommentsProvider({ children }) {
 
 function withReply(comments, post, trail) {
   let newComments = [...comments];
-  let current = newComments;
+  let itr = newComments;
   trail.forEach((trailId, index) => {
-    const target = current.find(({ id }) => id === trailId);
+    const target = itr.find(({ id }) => id === trailId);
     if (index === trail.length - 1) {
       target.replies = [...target.replies, post];
       return;
     }
-    current = target.replies;
+    itr = target.replies;
   });
   return newComments;
+}
+
+function delComment(comments, trail) {
+  if (trail.length === 1) {
+    return comments.filter(({ id }) => id !== trail[0]);
+  }
+
+  let newState = [...comments];
+  let itr = newState;
+
+  for (let i = 0; i < trail.length - 1; i++) {
+    newState = newState.find(({ id }) => id === trail[i]);
+    if (i !== trail.length - 2) {
+      newState = newState.replies;
+    }
+  }
+
+  newState.replies = newState.replies.filter(
+    (cmt) => cmt.id !== trail[trail.length - 1]
+  );
+  return itr;
 }
 
 export function useComments() {
@@ -51,5 +70,9 @@ export function useComments() {
   const addComment = (newComment) =>
     setComments((comments) => [...comments, newComment]);
 
-  return { addComment, comments, addReply };
+  const deleteComment = (trail) => {
+    setComments((comments) => delComment(comments, trail));
+  };
+
+  return { addComment, comments, addReply, deleteComment };
 }
