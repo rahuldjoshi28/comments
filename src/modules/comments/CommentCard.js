@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CommentInput from "./CommentInput";
 import { useComments } from "./context";
 import { getCurrentUser, getCurrentUserName, getUserDetails } from "../user";
@@ -8,6 +8,7 @@ import { formatTimePassed } from "../../utils/time";
 import { Actions } from "./actions";
 import { Avatar } from "../../components/Avatar";
 import { createNewComment } from "./NewComment";
+import { IoCloseOutline } from "react-icons/io5";
 
 export function CommentCard({
   author,
@@ -20,11 +21,12 @@ export function CommentCard({
   likes,
 }) {
   const [reply, setReply] = useState(false);
+  const innerRef = useRef();
   const { dispatch } = useComments();
+
   const handleReply = (post) => {
     const newComment = createNewComment(getCurrentUserName(), post);
     dispatch(Actions.replyComment(newComment, trail));
-    setReply(false);
   };
 
   const authorDetails = getUserDetails(author);
@@ -33,6 +35,11 @@ export function CommentCard({
   const handleDelete = () => dispatch(Actions.deleteComment(trail));
 
   const handleLike = () => dispatch(Actions.likeComment(trail, currentUser));
+
+  const showReply = () => {
+    setReply(true);
+    innerRef.current?.focus();
+  };
 
   return (
     <Wrapper className={className}>
@@ -44,7 +51,7 @@ export function CommentCard({
         </CommentBox>
         <ActionFooter
           timestamp={timestamp}
-          onReply={() => setReply(true)}
+          onReply={showReply}
           onDelete={handleDelete}
           likes={likes}
           onLike={handleLike}
@@ -60,7 +67,13 @@ export function CommentCard({
             ))}
           </ReplyWrapper>
         )}
-        {reply && <ReplyInput onPost={handleReply} />}
+        {reply && (
+          <ReplyInput
+            onPost={handleReply}
+            onClose={() => setReply(false)}
+            innerRef={innerRef}
+          />
+        )}
       </CommentWrapper>
     </Wrapper>
   );
@@ -79,15 +92,46 @@ const Wrapper = styled(Flex)`
 
 const ReplyWrapper = styled.div``;
 
-function ReplyInput({ onPost }) {
+function ReplyInput({ onPost, onClose, innerRef }) {
   const currentUser = getCurrentUser();
+
+  const handlePost = (e) => {
+    onPost(e);
+    innerRef.current.focus();
+  };
+
   return (
     <InputWrapper>
       <Avatar src={currentUser.avatarUrl} userName={currentUser.userName} />
-      <CommentInput placeholder={"Write a reply..."} onPost={onPost} />
+      <ReplyInputWrapper>
+        <CommentInput
+          placeholder={"Write a reply..."}
+          onPost={handlePost}
+          ref={innerRef}
+        />
+        <CloseButton onClick={onClose}>
+          <CloseReply />
+        </CloseButton>
+      </ReplyInputWrapper>
     </InputWrapper>
   );
 }
+
+const CloseButton = styled.button`
+  border: none;
+  background-color: transparent;
+`;
+
+const ReplyInputWrapper = styled(Flex)`
+  align-items: center;
+  flex-grow: 1;
+`;
+
+const CloseReply = styled(IoCloseOutline)`
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+`;
 
 const InputWrapper = styled(Flex)`
   margin-top: 10px;
